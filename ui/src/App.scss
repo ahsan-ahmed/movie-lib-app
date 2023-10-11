@@ -1,5 +1,13 @@
-.App {
+.Movies {
   text-align: center;
+  width: 900px;
+  margin: 0px auto;
+  .header {
+    height: 110px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
 }
 
 .App-logo {
