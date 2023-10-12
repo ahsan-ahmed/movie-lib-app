@@ -15,12 +15,56 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import DeleteIcon from '@mui/icons-material/Delete';
+// import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 // import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { MoviesItemType } from '../../utils/types';
+import SearchIcon from '@mui/icons-material/Search';
+import { styled, } from '@mui/material/styles';
+import InputBase from '@mui/material/InputBase';
 
+const Search = styled('div')(({ theme }) => ({
+    position: "absolute",
+    right: 0,
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.15),
+    '&:hover': {
+        backgroundColor: alpha(theme.palette.common.white, 0.25),
+    },
+    marginRight: theme.spacing(2),
+    marginLeft: 0,
+    width: '100%',
+    border: "1px solid #d6d6d6",
+    [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(3),
+        width: 'auto',
+    },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    '& .MuiInputBase-input': {
+        padding: theme.spacing(1, 1, 1, 0),
+        // vertical padding + font size from searchIcon
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('md')]: {
+            width: '20ch',
+        },
+    },
+}));
 
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
@@ -81,7 +125,7 @@ const headCells: readonly HeadCell[] = [
         id: 'duration',
         numeric: true,
         disablePadding: false,
-        label: 'Duration',
+        label: 'Duration (Hrs)',
     },
     {
         id: 'rating',
@@ -151,14 +195,17 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 interface EnhancedTableToolbarProps {
     numSelected: number;
     onClickEdit: () => void;
+    filterText: string;
+    setFilterText: (text: string) => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { numSelected, onClickEdit } = props;
+    const { numSelected, onClickEdit, filterText, setFilterText } = props;
 
     return (
         <Toolbar
             sx={{
+                position: 'relative',
                 pl: { sm: 2 },
                 pr: { xs: 1, sm: 1 },
                 ...(numSelected > 0 && {
@@ -186,13 +233,24 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     Movies
                 </Typography>
             )}
-            {numSelected > 0 && (
+            <Search>
+                <SearchIconWrapper>
+                    <SearchIcon />
+                </SearchIconWrapper>
+                <StyledInputBase
+                    placeholder="Search…"
+                    inputProps={{ 'aria-label': 'search' }}
+                    value={filterText}
+                    onChange={e => setFilterText(e.target.value.toLocaleLowerCase())}
+                />
+            </Search>
+            {/* {numSelected > 0 && (
                 <Tooltip title="Delete">
                     <IconButton>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
-            )}
+            )} */}
             {numSelected === 1 && (
                 <Tooltip title="Edit">
                     <IconButton onClick={onClickEdit}>
@@ -217,6 +275,7 @@ interface ListMoviesTableProps {
     selectedMovie: MoviesItemType | null;
 }
 export default function ListMoviesTable({ moviesList, onClickEdit, selectedMovie }: ListMoviesTableProps) {
+    const [filterText, setFilterText] = React.useState("");
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState<keyof MoviesItemType>('name');
     const [selected, setSelected] = React.useState<readonly string[]>([]);
@@ -224,12 +283,19 @@ export default function ListMoviesTable({ moviesList, onClickEdit, selectedMovie
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
-    console.log(selected, "selected")
     React.useEffect(() => {
         if (!selectedMovie) {
             setSelected([]);
         }
     }, [selectedMovie])
+
+    const filteredItems = moviesList.filter(
+        item =>
+            item.name.toLocaleLowerCase().includes(filterText)
+    );
+
+    const itemsToDisplay = filterText ? filteredItems : moviesList;
+
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
         property: keyof MoviesItemType,
@@ -285,24 +351,29 @@ export default function ListMoviesTable({ moviesList, onClickEdit, selectedMovie
 
     // Avoid a layout jump when reaching the last page with empty rows.
     const emptyRows =
-        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - moviesList.length) : 0;
+        page > 0 ? Math.max(0, (1 + page) * rowsPerPage - itemsToDisplay.length) : 0;
 
     const visibleRows = React.useMemo(
         () =>
-            stableSort(moviesList, getComparator(order, orderBy)).slice(
+            stableSort(itemsToDisplay, getComparator(order, orderBy)).slice(
                 page * rowsPerPage,
                 page * rowsPerPage + rowsPerPage,
             ),
-        [moviesList, order, orderBy, page, rowsPerPage],
+        [itemsToDisplay, order, orderBy, page, rowsPerPage],
     );
 
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} onClickEdit={() => {
-                    let movie = moviesList.find(m => m.name === selected[0]) || null;
-                    onClickEdit(movie);
-                }} />
+                <EnhancedTableToolbar
+                    numSelected={selected.length}
+                    onClickEdit={() => {
+                        let movie = itemsToDisplay.find(m => m.name === selected[0]) || null;
+                        onClickEdit(movie);
+                    }}
+                    filterText={filterText}
+                    setFilterText={setFilterText}
+                />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
