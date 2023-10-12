@@ -1,30 +1,46 @@
-import React, { useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import AddMovies from "./AddMovies";
 import ListMovies from "./ListMovies";
 import Button from '@mui/material/Button';
 import { CSVLink } from 'react-csv'
 import { MoviesItemType } from "../../utils/types";
 import { downloadFileTxt } from "../../utils/helpers";
-// import { downloadFileJson } from "../../utils/helpers";
 
-const MOVIES_LIST = [
-    { id: 1, name: "abc1", duration: "90", rating: "5" },
-    { id: 2, name: "abc2", duration: "200", rating: "5" },
-    { id: 3, name: "abc3", duration: "420", rating: "5" },
-]
 const Movies = () => {
     const csvLink = useRef(null) // setup the ref that we'll use for the hidden CsvLink click once we've updated the data
     const [openMoviesDialog, setOpenMoviesDialog] = useState(false);
-    const [moviesList, setMoviesList] = useState<Array<MoviesItemType>>([...MOVIES_LIST]);
+    const [moviesList, setMoviesList] = useState<Array<MoviesItemType>>([]);
     const [selectedMovie, setSelectedMovie] = useState<MoviesItemType | null>(null);
 
+    useEffect(() => {
+        fetch("http://localhost:8080/api/movies")
+            .then((response) => response.json())
+            .then((responseJson) => {
+                // console.log(responseJson);
+                setMoviesList(responseJson);
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }, [])
+
+    const handleAddMovie = async (movie: MoviesItemType) => {
+        const rawResponse = await fetch('http://localhost:8080/api/movies', {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(movie)
+        });
+        const content = await rawResponse.json();
+        setMoviesList([...moviesList, content]);
+    }
     return (
         <>
             <div className="header">
                 <Button variant="contained" onClick={() => {
-                    //  downloadFileJson(moviesList) 
                     downloadFileTxt(moviesList);
-                    // csvLink.current && csvLink.current.link && csvLink.current.link.click();
                 }} style={{ marginRight: 8 }}>Download Movies</Button>
                 <Button variant="contained" onClick={() => { setOpenMoviesDialog(true) }}>Add Movies</Button>
             </div>
@@ -46,7 +62,7 @@ const Movies = () => {
                         _moviesList[foundIndex] = movie;
                         setMoviesList(_moviesList);
                     } else {
-                        setMoviesList([...moviesList, movie]);
+                        handleAddMovie(movie);
                     }
                 }}
                 selectedMovie={selectedMovie}
