@@ -2,15 +2,18 @@ import React, { useState } from "react"
 import AddMovies from "./AddMovies";
 import ListMovies from "./ListMovies";
 import Button from '@mui/material/Button';
+import { MoviesItemType } from "../../utils/types";
 
-interface IMoviesState {
-    name: string;
-    duration: string;
-    rating: string;
-}
+const MOVIES_LIST = [
+    { id: 1, name: "abc1", duration: "1", rating: "5" },
+    { id: 2, name: "abc2", duration: "2", rating: "5" },
+    { id: 3, name: "abc3", duration: "3", rating: "5" },
+]
 const Movies = () => {
     const [openMoviesDialog, setOpenMoviesDialog] = useState(false);
-    const [moviesList, setMoviesList] = useState<Array<IMoviesState>>([]);
+    const [moviesList, setMoviesList] = useState<Array<MoviesItemType>>([...MOVIES_LIST]);
+    const [selectedMovie, setSelectedMovie] = useState<MoviesItemType | null>(null);
+
     return (
         <>
             <div className="header">
@@ -18,13 +21,29 @@ const Movies = () => {
             </div>
             <AddMovies
                 open={openMoviesDialog}
-                onClose={() => { setOpenMoviesDialog(false) }}
+                onClose={() => { setOpenMoviesDialog(false); setSelectedMovie(null); }}
                 submitMovies={(movie) => {
-                    // console.log(movie, "movie");
-                    setMoviesList([...moviesList, movie]);
+                    console.log(movie, "submitMovies");
+                    if (selectedMovie) {
+                        let _moviesList = [...moviesList];
+                        let foundIndex = _moviesList.findIndex(x => x.name === selectedMovie.name);
+                        _moviesList[foundIndex] = movie;
+                        setMoviesList(_moviesList);
+                    } else {
+                        setMoviesList([...moviesList, movie]);
+                    }
                 }}
+                selectedMovie={selectedMovie}
             />
-            <ListMovies moviesList={moviesList} />
+            <ListMovies
+                moviesList={moviesList}
+                onClickEdit={(movie) => {
+                    // console.log(movie, "onClickEdit");
+                    setOpenMoviesDialog(true);
+                    setSelectedMovie(movie);
+                }}
+                selectedMovie={selectedMovie}
+            />
         </>
     )
 }

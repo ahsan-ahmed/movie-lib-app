@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@mui/material/Button';
 import TextField from '@mui/material/TextField';
 import Dialog from '@mui/material/Dialog';
@@ -12,20 +12,25 @@ interface AddMoviesProp {
     onClose: () => void;
     open: boolean;
     submitMovies: (form: MoviesItemType) => void;
+    selectedMovie: MoviesItemType | null;
 }
 const default_values = { name: "", duration: "", rating: "" };
 
-export default function AddMovies({ open, onClose, submitMovies }: AddMoviesProp) {
-    const [form, setForm] = useState(default_values);
+export default function AddMovies({ open, onClose, submitMovies, selectedMovie }: AddMoviesProp) {
+    const [form, setForm] = useState<MoviesItemType>(default_values);
     const handleFormSubmit = (e: any) => {
         e.preventDefault();
         submitMovies(form);
         onClose();
     }
+    useEffect(() => {
+        setForm({ name: selectedMovie?.name || "", duration: selectedMovie?.duration || "", rating: selectedMovie?.rating || "" })
+    }, [selectedMovie])
+
     return (
         <Dialog open={open} onClose={onClose}>
             <form onSubmit={handleFormSubmit}>
-                <DialogTitle>Add Movie</DialogTitle>
+                <DialogTitle>{`${selectedMovie ? "Update" : "Add"} Movie`}</DialogTitle>
                 <DialogContent>
                     <Box
                         sx={{ mt: 1 }}
@@ -88,7 +93,7 @@ export default function AddMovies({ open, onClose, submitMovies }: AddMoviesProp
                         setForm({ ...default_values })
                     }}>
                         Cancel</Button>
-                    <Button type={"submit"}>Add</Button>
+                    <Button type={"submit"}>{selectedMovie ? "Update" : "Add"}</Button>
                 </DialogActions>
             </form>
         </Dialog>

@@ -16,7 +16,8 @@ import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import DeleteIcon from '@mui/icons-material/Delete';
-import FilterListIcon from '@mui/icons-material/FilterList';
+import EditIcon from '@mui/icons-material/Edit';
+// import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
 import { MoviesItemType } from '../../utils/types';
 
@@ -149,10 +150,11 @@ function EnhancedTableHead(props: EnhancedTableProps) {
 
 interface EnhancedTableToolbarProps {
     numSelected: number;
+    onClickEdit: () => void;
 }
 
 function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
-    const { numSelected } = props;
+    const { numSelected, onClickEdit } = props;
 
     return (
         <Toolbar
@@ -184,27 +186,37 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     Movies
                 </Typography>
             )}
-            {numSelected > 0 ? (
+            {numSelected > 0 && (
                 <Tooltip title="Delete">
                     <IconButton>
                         <DeleteIcon />
                     </IconButton>
                 </Tooltip>
-            ) : (
-                <Tooltip title="Filter list">
-                    <IconButton>
-                        <FilterListIcon />
+            )}
+            {numSelected === 1 && (
+                <Tooltip title="Edit">
+                    <IconButton onClick={onClickEdit}>
+                        <EditIcon />
                     </IconButton>
                 </Tooltip>
             )}
+            {/* // : (
+                //     <Tooltip title="Filter list">
+                //         <IconButton>
+                //             <FilterListIcon />
+                //         </IconButton>
+                //     </Tooltip>
+                // ) */}
         </Toolbar>
     );
 }
 
 interface ListMoviesTableProps {
-    moviesList: Array<MoviesItemType>
+    moviesList: Array<MoviesItemType>;
+    onClickEdit: (form: MoviesItemType | null) => void;
+    selectedMovie: MoviesItemType | null;
 }
-export default function ListMoviesTable({ moviesList }: ListMoviesTableProps) {
+export default function ListMoviesTable({ moviesList, onClickEdit, selectedMovie }: ListMoviesTableProps) {
     const [order, setOrder] = React.useState<Order>('asc');
     const [orderBy, setOrderBy] = React.useState<keyof MoviesItemType>('name');
     const [selected, setSelected] = React.useState<readonly string[]>([]);
@@ -212,6 +224,12 @@ export default function ListMoviesTable({ moviesList }: ListMoviesTableProps) {
     const [dense, setDense] = React.useState(false);
     const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
+    console.log(selected, "selected")
+    React.useEffect(() => {
+        if (!selectedMovie) {
+            setSelected([]);
+        }
+    }, [selectedMovie])
     const handleRequestSort = (
         event: React.MouseEvent<unknown>,
         property: keyof MoviesItemType,
@@ -281,7 +299,10 @@ export default function ListMoviesTable({ moviesList }: ListMoviesTableProps) {
     return (
         <Box sx={{ width: '100%' }}>
             <Paper sx={{ width: '100%', mb: 2 }}>
-                <EnhancedTableToolbar numSelected={selected.length} />
+                <EnhancedTableToolbar numSelected={selected.length} onClickEdit={() => {
+                    let movie = moviesList.find(m => m.name === selected[0]) || null;
+                    onClickEdit(movie);
+                }} />
                 <TableContainer>
                     <Table
                         sx={{ minWidth: 750 }}
