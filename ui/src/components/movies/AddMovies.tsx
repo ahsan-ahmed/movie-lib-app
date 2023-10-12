@@ -6,17 +6,21 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Box from '@mui/material/Box';
+import { MoviesItemType } from '../../utils/types';
 
 interface AddMoviesProp {
     onClose: () => void;
     open: boolean;
+    submitMovies: (form: MoviesItemType) => void;
 }
 const default_values = { name: "", duration: "", rating: "" };
 
-export default function AddMovies({ open, onClose }: AddMoviesProp) {
+export default function AddMovies({ open, onClose, submitMovies }: AddMoviesProp) {
     const [form, setForm] = useState(default_values);
     const handleFormSubmit = (e: any) => {
         e.preventDefault();
+        submitMovies(form);
+        onClose();
     }
     return (
         <Dialog open={open} onClose={onClose}>
