@@ -14,7 +14,7 @@ interface AddMoviesProp {
     submitMovies: (form: MoviesItemType) => void;
     selectedMovie: MoviesItemType | null;
 }
-const default_values = { name: "", duration: "", rating: "" };
+const default_values = { id: Math.random(), name: "", duration: "", rating: "" };
 
 export default function AddMovies({ open, onClose, submitMovies, selectedMovie }: AddMoviesProp) {
     const [form, setForm] = useState<MoviesItemType>(default_values);
@@ -24,7 +24,7 @@ export default function AddMovies({ open, onClose, submitMovies, selectedMovie }
         onClose();
     }
     useEffect(() => {
-        setForm({ name: selectedMovie?.name || "", duration: selectedMovie?.duration || "", rating: selectedMovie?.rating || "" })
+        setForm({ id: selectedMovie?.id || Math.random(), name: selectedMovie?.name || "", duration: selectedMovie?.duration || "", rating: selectedMovie?.rating || "" })
     }, [selectedMovie])
 
     return (

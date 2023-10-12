@@ -36,6 +36,22 @@ const Movies = () => {
         const content = await rawResponse.json();
         setMoviesList([...moviesList, content]);
     }
+
+    const handleUpdateMovie = async (movie: MoviesItemType) => {
+        const rawResponse = await fetch('http://localhost:8080/api/movies/' + movie.id, {
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(movie)
+        });
+        await rawResponse.json();
+        let _moviesList = [...moviesList];
+        let foundIndex = _moviesList.findIndex(x => x.id === movie.id);
+        _moviesList[foundIndex] = movie;
+        setMoviesList(_moviesList);
+    }
     return (
         <>
             <div className="header">
@@ -55,12 +71,8 @@ const Movies = () => {
                 open={openMoviesDialog}
                 onClose={() => { setOpenMoviesDialog(false); setSelectedMovie(null); }}
                 submitMovies={(movie) => {
-                    // console.log(movie, "submitMovies");
                     if (selectedMovie) {
-                        let _moviesList = [...moviesList];
-                        let foundIndex = _moviesList.findIndex(x => x.name === selectedMovie.name);
-                        _moviesList[foundIndex] = movie;
-                        setMoviesList(_moviesList);
+                        handleUpdateMovie(movie)
                     } else {
                         handleAddMovie(movie);
                     }
@@ -70,7 +82,6 @@ const Movies = () => {
             <ListMovies
                 moviesList={moviesList}
                 onClickEdit={(movie) => {
-                    // console.log(movie, "onClickEdit");
                     setOpenMoviesDialog(true);
                     setSelectedMovie(movie);
                 }}
