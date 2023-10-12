@@ -80,7 +80,7 @@ export default function AddMovies({ open, onClose, submitMovies, selectedMovie }
                             value={form.rating}
                             onChange={(e) => {
                                 const re = /^[0-9\b]+$/;
-                                if (e.target.value === '' || re.test(e.target.value) && (Number(e.target.value) >= 1 && Number(e.target.value) <= 10)) {
+                                if (e.target.value === '' || re.test(e.target.value) || e.target.value.match(/^\d{1,}(\.\d{0,1})?$/)) {
                                     setForm({ ...form, rating: e.target.value })
                                 }
                             }}

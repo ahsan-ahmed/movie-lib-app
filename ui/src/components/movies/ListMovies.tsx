@@ -233,7 +233,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     Movies
                 </Typography>
             )}
-            <Search>
+            {!numSelected && <Search>
                 <SearchIconWrapper>
                     <SearchIcon />
                 </SearchIconWrapper>
@@ -243,14 +243,7 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     value={filterText}
                     onChange={e => setFilterText(e.target.value.toLocaleLowerCase())}
                 />
-            </Search>
-            {/* {numSelected > 0 && (
-                <Tooltip title="Delete">
-                    <IconButton>
-                        <DeleteIcon />
-                    </IconButton>
-                </Tooltip>
-            )} */}
+            </Search>}
             {numSelected === 1 && (
                 <Tooltip title="Edit">
                     <IconButton onClick={onClickEdit}>
@@ -258,13 +251,6 @@ function EnhancedTableToolbar(props: EnhancedTableToolbarProps) {
                     </IconButton>
                 </Tooltip>
             )}
-            {/* // : (
-                //     <Tooltip title="Filter list">
-                //         <IconButton>
-                //             <FilterListIcon />
-                //         </IconButton>
-                //     </Tooltip>
-                // ) */}
         </Toolbar>
     );
 }
