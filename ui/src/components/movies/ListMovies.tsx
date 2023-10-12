@@ -407,7 +407,7 @@ export default function ListMoviesTable({ moviesList, onClickEdit, selectedMovie
                                         >
                                             {row.name}
                                         </TableCell>
-                                        <TableCell align="right">{row.duration}</TableCell>
+                                        <TableCell align="right">{(Number(row.duration) / 60).toFixed(0)}</TableCell>
                                         <TableCell align="right">{row.rating}</TableCell>
                                     </TableRow>
                                 );

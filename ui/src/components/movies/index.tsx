@@ -8,9 +8,9 @@ import { downloadFileTxt } from "../../utils/helpers";
 // import { downloadFileJson } from "../../utils/helpers";
 
 const MOVIES_LIST = [
-    { id: 1, name: "abc1", duration: "1", rating: "5" },
-    { id: 2, name: "abc2", duration: "2", rating: "5" },
-    { id: 3, name: "abc3", duration: "3", rating: "5" },
+    { id: 1, name: "abc1", duration: "90", rating: "5" },
+    { id: 2, name: "abc2", duration: "200", rating: "5" },
+    { id: 3, name: "abc3", duration: "420", rating: "5" },
 ]
 const Movies = () => {
     const csvLink = useRef(null) // setup the ref that we'll use for the hidden CsvLink click once we've updated the data

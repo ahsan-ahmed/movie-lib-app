@@ -55,7 +55,7 @@ export default function AddMovies({ open, onClose, submitMovies, selectedMovie }
                     >
                         <TextField
                             id="duration"
-                            label="Duration"
+                            label="Duration (Minutes)"
                             fullWidth
                             required
                             variant="standard"
@@ -73,7 +73,7 @@ export default function AddMovies({ open, onClose, submitMovies, selectedMovie }
                     >
                         <TextField
                             id="rating"
-                            label="Rating"
+                            label="Rating (0-10)"
                             fullWidth
                             required
                             variant="standard"
