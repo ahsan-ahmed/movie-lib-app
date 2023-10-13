@@ -13,7 +13,7 @@ const Movies = () => {
     const [selectedMovie, setSelectedMovie] = useState<MoviesItemType | null>(null);
 
     useEffect(() => {
-        fetch("http://localhost:8080/api/movies")
+        fetch("http://localhost:6868/api/movies")
             .then((response) => response.json())
             .then((responseJson) => {
                 // console.log(responseJson);
@@ -25,7 +25,7 @@ const Movies = () => {
     }, [])
 
     const handleAddMovie = async (movie: MoviesItemType) => {
-        const rawResponse = await fetch('http://localhost:8080/api/movies', {
+        const rawResponse = await fetch('http://localhost:6868/api/movies', {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
@@ -38,7 +38,7 @@ const Movies = () => {
     }
 
     const handleUpdateMovie = async (movie: MoviesItemType) => {
-        const rawResponse = await fetch('http://localhost:8080/api/movies/' + movie.id, {
+        const rawResponse = await fetch('http://localhost:6868/api/movies/' + movie.id, {
             method: 'PUT',
             headers: {
                 'Accept': 'application/json',
